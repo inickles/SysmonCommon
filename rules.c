@@ -1805,12 +1805,20 @@ MatchFilterGroup(
 #if defined __linux__
 		// on Linux, convert data to UTF16, on heap
 		size_t fieldValueLen = UTF8toUTF16( NULL, (PCHAR)fieldValue, 0 );
+		if ( fieldValueLen == 0 ) {
+			printf("Failed to convert field value to UTF-16LE for calculating length\n");
+			return Failed;
+		}
         WCHAR *fieldValueUTF16 = (WCHAR *)malloc(fieldValueLen * sizeof(WCHAR));
         if (fieldValueUTF16 == NULL) {
             printf("Out of memory\n");
             return Failed;
         }
-		UTF8toUTF16( fieldValueUTF16, (PCHAR)fieldValue, fieldValueLen );
+		if ( 0 == UTF8toUTF16( fieldValueUTF16, (PCHAR)fieldValue, fieldValueLen ) ) {
+			// unlikely
+			printf("Failed to convert field value to UTF-16LE\n");
+			return Failed;
+		}
 		fieldValue = fieldValueUTF16;
 #endif
 
